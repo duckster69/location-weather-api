@@ -1,77 +1,58 @@
 <!DOCTYPE html>
 <html>
-
-<header>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-</header>
+<head>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 <body class="mx-auto" style="width: 400px;">
+  <img src="https://cyberhoot.com/wp-content/uploads/2020/07/Free-Courses-to-learn-JavaScript.jpg" class="img-fluid" alt="JavaScript">
+  <h1>JavaScript & API's</h1>
+  <p>With basic knowledge of JavaScript and API's, I can find out:</p>
+  <h2>You are from:</h2>
+  <p id="city">Loading city...</p>
+  <p id="country">Loading country...</p>
+  <h2>The weather there is:</h2>
+  <p id="weather">Loading weather...</p>
+  <h2>Your Internet Service Provider is:</h2>
+  <p id="isp">Loading ISP...</p>
+  <img src="https://www.planningpme.com/img/planningpme-api.jpg?dc=202011051200" class="img-fluid" alt="JavaScript">
+  <script>
+    async function loadLocation() {
+      try {
+        const myIpAddress = await fetch("https://api.ipify.org?format=json");
+        if (!myIpAddress.ok) throw new Error("Failed to fetch IP address");
+        const ipAddress = await myIpAddress.json();
+        
+        const response = await fetch("https://ip-geolocation-ipwhois-io.p.rapidapi.com/json/?ip=" + ipAddress.ip, {
+          method: "GET",
+          headers: {
+            "x-rapidapi-host": "ip-geolocation-ipwhois-io.p.rapidapi.com",
+            "x-rapidapi-key": "YOUR_API_KEY",
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch location");
+        const location = await response.json();
 
-<img src="https://cyberhoot.com/wp-content/uploads/2020/07/Free-Courses-to-learn-JavaScript.jpg" class="img-fluid" alt="JavaScript">
+        document.getElementById("city").innerHTML = location.city || "Unknown";
+        document.getElementById("country").innerHTML = location.country || "Unknown";
+        document.getElementById("isp").innerHTML = location.isp || "Unknown";
 
+        const responseW = await fetch("https://community-open-weather-map.p.rapidapi.com/find?q=" + location.city + "&units=imperial", {
+          method: "GET",
+          headers: {
+            "x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
+            "x-rapidapi-key": "YOUR_API_KEY",
+          },
+        });
+        if (!responseW.ok) throw new Error("Failed to fetch weather");
+        const weather = await responseW.json();
+        document.getElementById("weather").innerHTML = weather.list[0]?.weather[0]?.description || "Unknown";
+      } catch (error) {
+        console.error("Error:", error.message);
+        alert("An error occurred. Please try again later.");
+      }
+    }
 
-<h1>JavaScript & API's</h1>
-<p>With basic knowledge of JavaScript and API's I can find out that: </p>
-
-<h2>You are from:</h2>
-<p id="city"></p>
-<p id="country"></p>
-<h2>The weather there is: </h2>
-<p id="weather"></p>
-<h2>Your Internet Service Provider is:</h2>
-<p id="isp"></p>
-
-<img src="https://www.planningpme.com/img/planningpme-api.jpg?dc=202011051200" class="img-fluid" alt="JavaScript">
-
-
-<script>
- 
-
-
-async function loadLocation() {
-  const myIpAddress = await fetch("https://api.ipify.org?format=json");
-  
-  const ipAddress = await myIpAddress.json();
-  console.log("my IP Address is: ", ipAddress);
-  const response = await fetch("https://ip-geolocation-ipwhois-io.p.rapidapi.com/json/?ip="+ipAddress.ip, {
-	"method": "GET",
-	"headers": {
-		"x-rapidapi-host": "ip-geolocation-ipwhois-io.p.rapidapi.com",
-		"x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
-	}
-});
-  const location = await response.json();
-
- document.getElementById("city").innerHTML = location.city;
- document.getElementById("country").innerHTML = location.country;  
- document.getElementById("isp").innerHTML = location.isp;  
-
-  console.log(location); 
-
-
-  const responseW = await fetch("https://community-open-weather-map.p.rapidapi.com/find?q="+location.city+"&units=imperial", {
-	"method": "GET",
-	"headers": {
-		"x-rapidapi-host": "community-open-weather-map.p.rapidapi.com",
-		"x-rapidapi-key": "044e648b19mshfece6f865ead2b3p1a1a7ajsn036a4345378f"
-	}
-});
-
-  const weather = await responseW.json();
-
- document.getElementById("weather").innerHTML = weather.list[0].weather[0].description;
- 
-
-  console.log(weather.list[0].weather[0].main); 
-
-}
-
-
-
-
-loadLocation();
-
-
-</script>
-
+    loadLocation();
+  </script>
 </body>
 </html>
